@@ -31,7 +31,7 @@ jobs:
         run: node tools/build-arcgis-layer.mjs .cache/floodwatch.json .cache/parishes.geojson _site/arcgis
       - name: Montar o site
         run: |
-          cp index.html zip-map.html _site/
+          cp index.html zip-map.html _site/; cp -r exemplo _site/exemplo
           cp -r assets _site/assets
           cp arcgis/README.html _site/arcgis/README.html
           touch _site/.nojekyll

@@ -42,7 +42,7 @@ const NAMES=['Sem dados','Baixa','Moderada','Elevada','Muito elevada','Crítica'
 $('legend').innerHTML=NAMES.map((n,i)=>`<div class="row"><span class="sw" style="background:${COLORS[i]}"></span>${n}</div>`).join('');
 async function getJSON(f,opt){const r=await fetch(BASE+f+'?v='+Math.floor(Date.now()/60000));if(!r.ok){if(opt)return null;throw new Error(f+' '+r.status);}return r.json();}
 async function getGeo(){try{const r=await fetch(BASE+'parishes.geojson.gz');if(r.ok&&self.DecompressionStream)return JSON.parse(await new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text());}catch(e){}return getJSON('parishes.geojson');}
-const map=new maplibregl.Map({container:'map',style:{version:8,sources:{osm:{type:'raster',tiles:['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],tileSize:256,attribution:'© OpenStreetMap'}},layers:[{id:'osm',type:'raster',source:'osm'}]},center:[-8.2,39.6],zoom:6});
+const map=new maplibregl.Map({container:'map',style:{version:8,sources:{osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,attribution:'© OpenStreetMap'}},layers:[{id:'osm',type:'raster',source:'osm'}]},center:[-8.2,39.6],zoom:6});
 map.addControl(new maplibregl.NavigationControl());
 let geo,watch,ai,suspended=false,mode='ias';
 const cls=(p,m)=>{if(suspended)return 0;const src=m==='ai'?ai?.parishes?.[p.dtmnfr]:watch.parishes[p.dtmnfr];return src&&Number.isInteger(src.a)?src.a:0;};

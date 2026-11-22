@@ -22,11 +22,12 @@ button{background:#0a3d62;color:#fff;border:0;border-radius:6px;padding:6px 12px
 <h1>Floods AI · ZIP Copernicus → mapa</h1>
 <small>Carregue um ou mais pacotes de delineação do Copernicus EMS Rapid Mapping (<code>EMSRxxx_AOIyy_DEL_…zip</code>). Tudo corre neste browser: nada é enviado para fora (só são lidos os dados públicos do Floods).</small>
 <div id="drop" style="margin-top:10px">Largue aqui o(s) ficheiro(s) ZIP<br>ou clique para escolher <small>(aceita qualquer ficheiro ZIP, mesmo sem extensão .zip)</small><input id="file" type="file" multiple hidden></div>
+<p style="margin:6px 0"><a href="#" id="demo">▶ Experimentar com um exemplo (EMSR864 AOI18, Copernicus EMS)</a></p>
 <h2>Estado</h2><div class="card" id="status">À espera de ZIP.</div>
 <h2>Camadas</h2>
 <div class="card"><label class="row"><input type="radio" name="col" value="flood" checked> Freguesias coloridas por % inundada</label>
 <label class="row"><input type="radio" name="col" value="ias"> Freguesias coloridas pelo IAS estrutural (Floods)</label>
-<label class="row">Mapa base: <select id="base"><option value="claro">Claro (CARTO)</option><option value="satelite">Satélite (Esri)</option></select></label>
+<label class="row">Mapa base: <select id="base"><option value="claro">OpenStreetMap</option><option value="satelite">Satélite (Esri)</option></select></label>
 <label class="row"><input type="checkbox" id="tFlood" checked> Mancha de cheia observada (Copernicus)</label>
 <label class="row"><input type="checkbox" id="tAoi" checked> Área de interesse (AOI)</label></div>
 <div id="legend"></div>
@@ -38,7 +39,7 @@ button{background:#0a3d62;color:#fff;border:0;border-radius:6px;padding:6px 12px
 <script>
 const $=id=>document.getElementById(id), FL='https://dsantananet.github.io/ignispyro-floods/data/';
 const IASC=['#9aa9ad','#4fae7b','#e3c941','#ee9b3d','#d9503f','#8e2f78'];
-const BASES={claro:{t:['a','b','c','d'].map(x=>`https://${x}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png`),a:'© OpenStreetMap, © CARTO'},
+const BASES={claro:{t:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],a:'© OpenStreetMap'},
  satelite:{t:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],a:'Esri, Maxar, Earthstar Geographics'}};
 const map=new maplibregl.Map({container:'map',center:[-8.1,39.6],zoom:6,style:{version:8,sources:{claro:{type:'raster',tiles:BASES.claro.t,tileSize:256,attribution:BASES.claro.a},satelite:{type:'raster',tiles:BASES.satelite.t,tileSize:256,attribution:BASES.satelite.a}},layers:[{id:'b-claro',type:'raster',source:'claro'},{id:'b-satelite',type:'raster',source:'satelite',layout:{visibility:'none'}}]}});
 let ctx={par:null,sus:null,ter:null,fw:null},mapReady=new Promise(r=>map.on('load',r));
@@ -113,9 +114,10 @@ async function fromFiles(list){const all=[...list];if(!all.length)return say('Ne
   if(h[0]===0x50&&h[1]===0x4b)out.push({name:f.name,buf});else skip.push(f.name)}   // ZIP = começa por "PK"
  if(!out.length)return say('Erro: nenhum dos ficheiros é um ZIP ('+skip.join(', ')+'). Use os pacotes EMSRxxx_AOIyy_DEL_….zip do Copernicus.');
  if(skip.length)console.warn('ignorados (não são ZIP):',skip);processBuffers(out)}
-const dz=$('drop');dz.onclick=()=>$('file').click();$('file').onchange=e=>fromFiles(e.target.files);
+const dz=$('drop');dz.onclick=e=>{if(e.target.id!=='file')$('file').click()};$('file').onchange=e=>fromFiles(e.target.files);
 dz.ondragover=e=>{e.preventDefault();dz.classList.add('on')};dz.ondragleave=()=>dz.classList.remove('on');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('on');fromFiles(e.dataTransfer.files)};
 window.addEventListener('dragover',e=>e.preventDefault());window.addEventListener('drop',e=>{e.preventDefault();if(e.target.closest&&e.target.closest('#drop'))return;fromFiles(e.dataTransfer.files)});
 window.addEventListener('error',e=>say('Erro: '+e.message));window.addEventListener('unhandledrejection',e=>say('Erro: '+(e.reason&&e.reason.message||e.reason)));
 window.processBuffers=processBuffers;
+$('demo').onclick=async e=>{e.preventDefault();try{say('A obter exemplo…');const r=await fetch('exemplo/EMSR864_AOI18_exemplo.zip');if(!r.ok)throw new Error('exemplo não encontrado');fromFiles([new File([await r.arrayBuffer()],'EMSR864_AOI18_exemplo.zip')])}catch(x){say('Erro: '+x.message)}};
 </script></body></html>
