@@ -1,0 +1,44 @@
+name: IGNISPYRO Floods Susceptibility — publicar (experimental)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '7,37 * * * *'
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Ler dados públicos do Floods (só leitura)
+        run: |
+          B=https://dsantananet.github.io/ignispyro-floods/data
+          mkdir -p .cache
+          curl -fsSL "$B/floodwatch.json" -o .cache/floodwatch.json
+          curl -fsSL "$B/parishes.geojson" -o .cache/parishes.geojson
+      - name: Construir camada ArcGIS
+        run: node tools/build-arcgis-layer.mjs .cache/floodwatch.json .cache/parishes.geojson _site/arcgis
+      - name: Montar o site
+        run: |
+          cp index.html zip-map.html _site/
+          cp -r assets _site/assets
+          cp arcgis/README.html _site/arcgis/README.html
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: _site }
+      - id: deployment
+        uses: actions/deploy-pages@v4

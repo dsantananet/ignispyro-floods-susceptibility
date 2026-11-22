@@ -1,0 +1,12 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Camada IAS para ArcGIS Online</title>
+<style>body{font:15px/1.5 system-ui,sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#0f2a3d}h1{color:#0a3d62}code{background:#e2eef6;padding:1px 5px;border-radius:4px}.tag{background:#b42318;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700}</style></head><body>
+<h1>Camada IAS para ArcGIS Online <span class="tag">EXPERIMENTAL — NÃO OPERACIONAL</span></h1>
+<p>O IAS (índice de ativação de suscetibilidade) do Floods, por freguesia, atualizado de 30 em 30 minutos a partir do <code>floodwatch.json</code> do Floods. Verde / amarelo / laranja / vermelho / roxo = classes 1 a 5; cinzento = sem dados.</p>
+<h2>Opção A — pontos, uso direto</h2>
+<p>Map Viewer → <b>Adicionar → Adicionar camada a partir de URL</b> → tipo <b>GeoJSON</b> → <code>https://dsantananet.github.io/ignispyro-floods-susceptibility/arcgis/ias-freguesias-pontos.geojson</code>. Simbologia por <code>classe_ias</code> (ou use <code>cor_hex</code>). Defina a atualização automática (ex.: 30 min).</p>
+<h2>Opção B — juntar às freguesias que já tem no ArcGIS</h2>
+<p>Adicione a tabela <code>…/arcgis/ias-freguesias.csv</code> (URL, tipo CSV, sem coordenadas) e faça uma <b>junção</b> à camada de freguesias (CAOP) pelo campo <code>dtmnfr</code>. Pinte as freguesias por <code>classe_ias</code>.</p>
+<h2>Campos</h2>
+<p><code>dtmnfr</code>, <code>freguesia</code>, <code>municipio</code>, <code>classe_ias</code> (0–5), <code>classe_nome</code>, <code>cor_hex</code>, <code>estrutural_1_5</code>, <code>ativacao_1_4</code>, <code>computed_at</code>, <code>idade_horas</code>, <code>desatualizado</code>, <code>estado</code>.</p>
+<p><b>Atenção.</b> Se o <code>floodwatch.json</code> do Floods tiver mais de 3 h, todas as freguesias ficam <code>classe_ias=0</code> («Sem dados (desatualizado)») — regra do próprio Floods. Não é probabilidade, previsão nem aviso; não substitui avisos oficiais.</p>
+<p><a href="../index.html">← Plataforma</a></p></body></html>
